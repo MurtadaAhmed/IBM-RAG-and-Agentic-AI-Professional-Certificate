@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Customer Support AI Workspace</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f9; color: #333; }
+        .container { max-width: 600px; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        textarea { width: 100%; border: 1px solid #ccc; border-radius: 4px; padding: 10px; font-size: 14px; box-sizing: border-radius; }
+        input[type="submit"] { background-color: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        input[type="submit"]:hover { background-color: #0056b3; }
+        .output-box { margin-top: 20px; padding: 15px; background: #e9ecef; border-left: 5px solid #007bff; border-radius: 4px; display: none; }
+        .metric { font-size: 12px; color: #666; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Customer Support AI Workspace</h1>
+    <form id="ai-form">
+        <label for="message"><strong>Enter Customer Inquiry:</strong></label><br><br>
+        <textarea id="message" name="message" rows="4" placeholder="Type customer complaint or question here..."></textarea><br><br>
+        <input type="submit" value="Analyze Inquiry">
+    </form>
+
+    <div id="response" class="output-box">
+        <h3>AI Analysis Results:</h3>
+        <p><strong>Summary:</strong> <span id="out-summary"></span></p>
+        <p><strong>Customer Sentiment:</strong> <span id="out-sentiment"></span>/100</p>
+        <p><strong>Suggested Draft Reply:</strong> <span id="out-reply"></span></p>
+        <p><strong>Recommended Action:</strong> <span id="out-step"></span></p>
+        <div class="metric">Model Latency: <span id="out-duration"></span> seconds</div>
+    </div>
+</div>
+
+<script>
+document.getElementById('ai-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    var message = document.getElementById('message').value;
+    var outputBox = document.getElementById('response');
+
+    if(!message.strip && message.trim() === "") return;
+
+    fetch('/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 'message': message })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.error) {
+            alert('Error: ' + data.error);
+        } else {
+            document.getElementById('out-summary').innerText = data.summary;
+            document.getElementById('out-sentiment').innerText = data.sentiment;
+            document.getElementById('out-reply').innerText = data.response;
+            document.getElementById('out-step').innerText = data.next_step;
+            document.getElementById('out-duration').innerText = data.duration;
+            outputBox.style.display = 'block';
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+});
+</script>
+
+</body>
+</html>
