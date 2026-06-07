@@ -53,9 +53,21 @@ question_answer_chain = create_stuff_documents_chain(llm, prompt)
 
 rag_chain = create_retrieval_chain(retriever, question_answer_chain)
 
-query = "What is the mobile phone policy?"
+print("\n" + "=" * 50)
+print("Welcome to your Private HR Assistant!")
+print("Type 'quit', 'exit', or 'bye' to stop the chat.")
+print("=" * 50 + "\n")
 
-response = rag_chain.invoke({"input": query})
+while True:
+    query = input("\nQuestion: ")
 
-print(response["answer"])
+    if query.lower() in ["quit", "exit", "bye"]:
+        print("Answer: Goodbye!")
+        break
 
+    print("Thinking...")
+
+    response = rag_chain.invoke({"input": query})
+
+    print("\nAnswer: ")
+    print(response["answer"])
